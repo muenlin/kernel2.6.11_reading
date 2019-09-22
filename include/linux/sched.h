@@ -222,11 +222,17 @@ struct mm_struct {
 	unsigned long free_area_cache;		/* first hole */
 	pgd_t * pgd;
 	atomic_t mm_users;			/* How many users with user space? */
+
+	//但mm_count递减时，内核都要检查它是否为零；如果是，就要解除这个内存描述符，
+	//因为不在有用户使用它
 	atomic_t mm_count;			/* How many references to "struct mm_struct" (users count as 1) */
 	int map_count;				/* number of VMAs */
 	struct rw_semaphore mmap_sem;
+
+	//线性区的自旋锁和页表的自旋锁
 	spinlock_t page_table_lock;		/* Protects page tables, mm->rss, mm->anon_rss */
 
+	//mm_struct list
 	struct list_head mmlist;		/* List of maybe swapped mm's.  These are globally strung
 						 * together off init_mm.mmlist, and are protected
 						 * by mmlist_lock
@@ -240,7 +246,9 @@ struct mm_struct {
 
 	unsigned long saved_auxv[42]; /* for /proc/PID/auxv */
 
+	//表示是否可以产生内存信息转存储的标志
 	unsigned dumpable:1;
+	//用于懒惰TLB交换的位掩码
 	cpumask_t cpu_vm_mask;
 
 	/* Architecture-specific MM context */
@@ -248,6 +256,7 @@ struct mm_struct {
 
 	/* Token based thrashing protection. */
 	unsigned long swap_token_time;
+	//如果最近发生了主缺页，设置该标志
 	char recent_pagein;
 
 	/* coredumping support */
@@ -260,7 +269,9 @@ struct mm_struct {
 
 	struct kioctx		default_kioctx;
 
+	//进程所拥有的最大页框数
 	unsigned long hiwater_rss;	/* High-water RSS usage */
+	//进程线性区最大的页数
 	unsigned long hiwater_vm;	/* High-water virtual memory usage */
 };
 
