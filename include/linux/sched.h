@@ -218,7 +218,7 @@ struct mm_struct {
 	
 	unsigned long mmap_base;		/* base of mmap area */
 
-	//内核从这个地址开始搜索进程的地址空间
+	//内核从这个地址开始搜索进程的地址空间 
 	unsigned long free_area_cache;		/* first hole */
 	pgd_t * pgd;
 	atomic_t mm_users;			/* How many users with user space? */
