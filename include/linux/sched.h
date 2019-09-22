@@ -205,7 +205,7 @@ extern void arch_unmap_area_topdown(struct vm_area_struct *area);
 
 
 struct mm_struct {
-	struct vm_area_struct * mmap;		/* list of VMAs */
+	struct vm_area_struct * mmap;		/* list of VMAs ,first*/
 	struct rb_root mm_rb;
 	struct vm_area_struct * mmap_cache;	/* last find_vma result */
 
