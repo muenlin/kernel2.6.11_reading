@@ -575,6 +575,8 @@ struct task_struct {
 	struct list_head ptrace_children;
 	struct list_head ptrace_list;
 
+	//mm==NULL for kernle, active_mm != NULL
+	//(mm=active_mm) != NULL  for user
 	struct mm_struct *mm, *active_mm;
 
 /* task state */
