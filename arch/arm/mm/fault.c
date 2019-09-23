@@ -231,7 +231,7 @@ do_page_fault(unsigned long addr, unsigned int fsr, struct pt_regs *regs)
 	if (in_interrupt() || !mm)
 		goto no_context;
 
-	down_read(&mm->mmap_sem);
+	down_read(&mm->mmap_sem);//why ??? I don't understand
 	fault = __do_page_fault(mm, addr, fsr, tsk);
 	up_read(&mm->mmap_sem);
 

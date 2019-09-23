@@ -84,6 +84,17 @@ struct pt_regs {
 #define ARM_ORIG_r0	uregs[17]
 
 #ifdef __KERNEL__
+//https://developer.arm.com/docs/ddi0595/b/aarch32-system-registers/cpsr
+//  M	     Meaning
+//0b0000	 User.
+//0b0001	 FIQ.
+//0b0010	 IRQ.
+//0b0011	 Supervisor.
+//0b0110	 Monitor.
+//0b0111	 Abort.
+//0b1010	 Hyp.
+//0b1011	 Undefined.
+//0b1111	 System.
 
 #define user_mode(regs)	\
 	(((regs)->ARM_cpsr & 0xf) == 0)
