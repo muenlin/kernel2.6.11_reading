@@ -142,6 +142,7 @@
 #define DELTA(p) \
 	(SCALE(TASK_NICE(p), 40, MAX_BONUS) + INTERACTIVE_DELTA)
 
+//交互进程
 #define TASK_INTERACTIVE(p) \
 	((p)->prio <= (p)->static_prio - DELTA(p))
 
@@ -216,11 +217,16 @@ struct runqueue {
 	 */
 	unsigned long nr_uninterruptible;
 
+	//过期队列中最老的进程被插入队列的时间
 	unsigned long expired_timestamp;
 	unsigned long long timestamp_last_tick;
+
+	//idle:当前cpu(this cpu)上swapper进程
 	task_t *curr, *idle;
 	struct mm_struct *prev_mm;
 	prio_array_t *active, *expired, arrays[2];
+
+	//过期队列中，静态优先最高的进程(数值最小)
 	int best_expired_prio;
 	atomic_t nr_iowait;
 
@@ -1237,6 +1243,7 @@ void fastcall wake_up_new_task(task_t * p, unsigned long clone_flags)
 				__activate_task(p, rq);
 			else {
 				p->prio = current->prio;
+				//其实把子进程放在了父进程的前面
 				list_add_tail(&p->run_list, &current->run_list);
 				p->array = current->array;
 				p->array->nr_active++;
@@ -1262,7 +1269,8 @@ void fastcall wake_up_new_task(task_t * p, unsigned long clone_flags)
 		 */
 		p->timestamp = (p->timestamp - this_rq->timestamp_last_tick)
 					+ rq->timestamp_last_tick;
-		__activate_task(p, rq);
+		//父子进程被放在了同一个队列吗，我没有看出来
+		__activate_task(p, rq);//插入队列的尾部
 		if (TASK_PREEMPTS_CURR(p, rq))
 			resched_task(rq->curr);
 
@@ -2415,6 +2423,7 @@ void scheduler_tick(void)
 	runqueue_t *rq = this_rq();
 	task_t *p = current;
 
+	//最近一次定时器中断的时间戳的值
 	rq->timestamp_last_tick = sched_clock();
 
 	if (p == rq->idle) {
@@ -2434,7 +2443,7 @@ void scheduler_tick(void)
 	 * The task was running during this tick - update the
 	 * time slice counter. Note: we do not update a thread's
 	 * priority until it either goes to sleep or uses up its
-	 * timeslice. This makes it possible for interactive tasks
+	 * timeslice. This makes it possible for interactive(交互) tasks
 	 * to use up their timeslices at their highest priority levels.
 	 */
 	if (rt_task(p)) {
@@ -2452,6 +2461,8 @@ void scheduler_tick(void)
 		}
 		goto out_unlock;
 	}
+
+	//以下处理的都是:normal task,not RT task
 	if (!--p->time_slice) {
 		dequeue_task(p, rq->active);
 		set_tsk_need_resched(p);
@@ -2461,8 +2472,13 @@ void scheduler_tick(void)
 
 		if (!rq->expired_timestamp)
 			rq->expired_timestamp = jiffies;
+
+		//处理非交互进程，直接放到过期队列中
+		//交互进程如果运行的时间太久了，也放置到过期队列中
 		if (!TASK_INTERACTIVE(p) || EXPIRED_STARVING(rq)) {
 			enqueue_task(p, rq->expired);
+
+			//更新优先级
 			if (p->static_prio < rq->best_expired_prio)
 				rq->best_expired_prio = p->static_prio;
 		} else

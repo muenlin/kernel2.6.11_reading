@@ -553,7 +553,7 @@ struct task_struct {
 
 	int prio, static_prio;
 	struct list_head run_list;
-	prio_array_t *array;
+	prio_array_t *array;//包含进程的运行队列的集合
 
 	unsigned long sleep_avg;
 	unsigned long long timestamp, last_ran;
@@ -561,6 +561,9 @@ struct task_struct {
 
 	unsigned long policy;
 	cpumask_t cpus_allowed;
+
+	//first_time_slice:如果进程肯定不会用完其时间片，就设置为1；
+	//time_slice:在进程的时间片中还剩余的时钟节拍数
 	unsigned int time_slice, first_time_slice;
 
 #ifdef CONFIG_SCHEDSTATS

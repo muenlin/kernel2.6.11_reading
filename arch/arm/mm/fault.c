@@ -192,10 +192,11 @@ survive:
 		tsk->maj_flt++;
 		return fault;
 	case VM_FAULT_MINOR:
-		tsk->min_flt++;
+		tsk->min_flt++; //carefully, not break!!! so keep going 
 	case VM_FAULT_SIGBUS:
 		return fault;
 	}
+	//others case ,default, go here
 
 	if (tsk->pid != 1)
 		goto out;
@@ -209,7 +210,7 @@ survive:
 
 check_stack:
 	if (vma->vm_flags & VM_GROWSDOWN && !expand_stack(vma, addr))
-		goto good_area;
+		goto good_area;//这里只是申请了vma，但是还没有page，因此还要申请page。
 out:
 	return fault;
 }
