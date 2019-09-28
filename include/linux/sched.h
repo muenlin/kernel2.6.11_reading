@@ -373,7 +373,7 @@ struct signal_struct {
 #define MAX_USER_RT_PRIO	100
 #define MAX_RT_PRIO		MAX_USER_RT_PRIO
 
-#define MAX_PRIO		(MAX_RT_PRIO + 40)
+#define MAX_PRIO		(MAX_RT_PRIO + 40)//(100 +40)
 
 #define rt_task(p)		(unlikely((p)->prio < MAX_RT_PRIO))
 

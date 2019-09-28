@@ -54,8 +54,8 @@
  * to static priority [ MAX_RT_PRIO..MAX_PRIO-1 ],
  * and back.
  */
-#define NICE_TO_PRIO(nice)	(MAX_RT_PRIO + (nice) + 20)
-#define PRIO_TO_NICE(prio)	((prio) - MAX_RT_PRIO - 20)
+#define NICE_TO_PRIO(nice)	(MAX_RT_PRIO + (nice) + 20) //(100+(nice) +20)
+#define PRIO_TO_NICE(prio)	((prio) - MAX_RT_PRIO - 20) //((prio) -100 -20)
 #define TASK_NICE(p)		PRIO_TO_NICE((p)->static_prio)
 
 /*
@@ -65,7 +65,7 @@
  */
 #define USER_PRIO(p)		((p)-MAX_RT_PRIO)
 #define TASK_USER_PRIO(p)	USER_PRIO((p)->static_prio)
-#define MAX_USER_PRIO		(USER_PRIO(MAX_PRIO))
+#define MAX_USER_PRIO		(USER_PRIO(MAX_PRIO)) //40
 
 /*
  * Some helpers for converting nanosecond timing to jiffy resolution
@@ -165,9 +165,13 @@
 #define SCALE_PRIO(x, prio) \
 	max(x * (MAX_PRIO - prio) / (MAX_USER_PRIO/2), MIN_TIMESLICE)
 
+
+//           case1:(140 - static_prio) * 20  , for static_prio < 120
+//基本时间片
+//           case2:(140 - static_prio) * 5   , for static_prio >=120
 static unsigned int task_timeslice(task_t *p)
 {
-	if (p->static_prio < NICE_TO_PRIO(0))
+	if (p->static_prio < NICE_TO_PRIO(0))//static_prio < 120
 		return SCALE_PRIO(DEF_TIMESLICE*4, p->static_prio);
 	else
 		return SCALE_PRIO(DEF_TIMESLICE, p->static_prio);
