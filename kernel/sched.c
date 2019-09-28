@@ -621,6 +621,8 @@ static inline void enqueue_task_head(struct task_struct *p, prio_array_t *array)
  *
  * Both properties are important to certain workloads.
  */
+// 普通进程动态优先级计算公式
+//prio =max(100, min(static_prio -bonus+5,139))
 static int effective_prio(task_t *p)
 {
 	int bonus, prio;
