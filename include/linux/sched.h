@@ -650,11 +650,15 @@ struct task_struct {
 	struct files_struct *files;
 /* namespace */
 	struct namespace *namespace;
+
 /* signal handlers */
+    //signal: thread group
 	struct signal_struct *signal;
 	struct sighand_struct *sighand;
 
 	sigset_t blocked, real_blocked;
+
+	// task self(only one)
 	struct sigpending pending;
 
 	unsigned long sas_ss_sp;

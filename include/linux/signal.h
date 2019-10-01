@@ -59,7 +59,9 @@ static inline void sigdelset(sigset_t *set, int _sig)
 
 static inline int sigismember(sigset_t *set, int _sig)
 {
+	//没有值是零的信号，因此bit0丢弃
 	unsigned long sig = _sig - 1;
+	
 	if (_NSIG_WORDS == 1)
 		return 1 & (set->sig[0] >> sig);
 	else
