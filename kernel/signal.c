@@ -845,6 +845,7 @@ specific_send_sig_info(int sig, struct siginfo *info, struct task_struct *t)
 {
 	int ret = 0;
 
+    //must disable local irq and take t->sighand->siglock spinlock
 	if (!irqs_disabled())
 		BUG();
 	assert_spin_locked(&t->sighand->siglock);
