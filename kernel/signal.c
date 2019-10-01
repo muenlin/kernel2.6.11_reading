@@ -839,7 +839,7 @@ out_set:
 #define LEGACY_QUEUE(sigptr, sig) \
 	(((sig) < SIGRTMIN) && sigismember(&(sigptr)->signal, (sig)))
 
-//向指定进程发送信号
+//向指定进程发送信号 
 static int
 specific_send_sig_info(int sig, struct siginfo *info, struct task_struct *t)
 {
