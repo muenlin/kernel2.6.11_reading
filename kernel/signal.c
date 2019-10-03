@@ -772,6 +772,7 @@ static void handle_stop_signal(int sig, struct task_struct *p)
 	}
 }
 
+//在挂起信号队列中插入一个新元素
 static int send_signal(int sig, struct siginfo *info, struct task_struct *t,
 			struct sigpending *signals)
 {
@@ -782,6 +783,7 @@ static int send_signal(int sig, struct siginfo *info, struct task_struct *t,
 	 * fast-pathed signals for kernel-internal things like SIGSTOP
 	 * or SIGKILL.
 	 */
+	 //force_sig_specific send SIGSTOP and SIGKILL, so info==2
 	if ((unsigned long)info == 2)
 		goto out_set;
 
@@ -850,6 +852,7 @@ specific_send_sig_info(int sig, struct siginfo *info, struct task_struct *t)
 		BUG();
 	assert_spin_locked(&t->sighand->siglock);
 
+	//why ?? info >2 
 	if (((unsigned long)info > 2) && (info->si_code == SI_TIMER))
 		/*
 		 * Set up a return to indicate that we dropped the signal.
