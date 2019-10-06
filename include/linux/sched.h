@@ -108,7 +108,12 @@ extern unsigned long nr_iowait(void);
 #define TASK_UNINTERRUPTIBLE	2
 #define TASK_STOPPED		4
 #define TASK_TRACED		8
+//进程的执行被终止，父进程还没有发送wait()前的状态
+//task_struct 结构还存在
 #define EXIT_ZOMBIE		16
+
+//父进程刚发送wait4()或者waitpid,因而进程由系统删除。为了防止竞争
+//把exit_zomble改为exit_dead
 #define EXIT_DEAD		32
 
 #define __set_task_state(tsk, state_value)		\
