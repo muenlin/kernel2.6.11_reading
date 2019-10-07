@@ -255,7 +255,7 @@ static inline int list_empty(const struct list_head *head)
 /**
  * list_empty_careful - tests whether a list is
  * empty _and_ checks that no other CPU might be
- * in the process of still modifying either member
+ * in the process of still modifying either member(next or prev)
  *
  * NOTE: using list_empty_careful() without synchronization
  * can only be safe if the only activity that can happen
