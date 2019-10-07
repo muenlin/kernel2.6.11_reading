@@ -323,8 +323,10 @@ struct signal_struct {
 	struct list_head posix_timers;
 
 	/* job control IDs */
+	//pgrp:P所在进程组的领头进程的PID
 	pid_t pgrp;
 	pid_t tty_old_pgrp;
+	//session:P的登录会话领头进程的PID
 	pid_t session;
 	/* boolean value for session group leader */
 	int leader;
@@ -596,6 +598,7 @@ struct task_struct {
 	unsigned long personality;
 	unsigned did_exec:1;
 	pid_t pid;
+	//p所在线程组的领头进程的PID
 	pid_t tgid;
 	/* 
 	 * pointers to (original) parent process, youngest child, younger sibling,
@@ -612,6 +615,7 @@ struct task_struct {
 	 */
 	struct list_head children;	/* list of my children */
 	struct list_head sibling;	/* linkage in my parent's children list */
+	//P所在进程组的领头进程的描述符指针
 	struct task_struct *group_leader;	/* threadgroup leader */
 
 	/* PID/PID hash table linkage. */
