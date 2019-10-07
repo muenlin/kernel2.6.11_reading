@@ -30,9 +30,11 @@ typedef struct __wait_queue wait_queue_t;
 typedef int (*wait_queue_func_t)(wait_queue_t *wait, unsigned mode, int sync, void *key);
 int default_wake_function(wait_queue_t *wait, unsigned mode, int sync, void *key);
 
+
+#define WQ_FLAG_EXCLUSIVE	0x01
 struct __wait_queue {
 	unsigned int flags;//0:非互斥进程，总是唤醒；1:互斥进程，选择性唤醒
-#define WQ_FLAG_EXCLUSIVE	0x01
+
 	struct task_struct * task;
 	wait_queue_func_t func;
 	struct list_head task_list;
