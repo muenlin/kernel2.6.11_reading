@@ -182,14 +182,24 @@ static unsigned int task_timeslice(task_t *p)
 /*
  * These are the runqueue data structures:
  */
+//for 32bit sizeof(long)==4, sizeof(double)==8
+//为什么要+1+7而不是直接+8，上次和TA讨论了一下，
+//豁然开朗。+1是为了把值加到140，+7是为了向上取整。
+//同理对于sizeof(long)- 1，他的结果是5，
+//也就是说bitmap是32*5=160bit的位数组。
+//这也构成了我们要用O(1)查找一个优先级最高进程的基础。
+//这也是2.6内核相对于2.4内核的巨大进步之处。
+//在bitmap中active的位是置1的，expired的位置0。
+//我们使用 sched_find_first_bit()来找到第一个非0位，
+//用 find_next_bit()来找下一个非0位
 
-#define BITMAP_SIZE ((((MAX_PRIO+1+7)/8)+sizeof(long)-1)/sizeof(long))
+#define BITMAP_SIZE ((((MAX_PRIO+1+7)/8)+sizeof(long)-1)/sizeof(long))  //5
 
 typedef struct runqueue runqueue_t;
 
 struct prio_array {
 	unsigned int nr_active;
-	unsigned long bitmap[BITMAP_SIZE];
+	unsigned long bitmap[BITMAP_SIZE]; //5
 	struct list_head queue[MAX_PRIO];
 };
 
