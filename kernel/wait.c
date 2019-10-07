@@ -114,6 +114,7 @@ void fastcall finish_wait(wait_queue_head_t *q, wait_queue_t *wait)
 	 *    have _one_ other CPU that looks at or modifies
 	 *    the list).
 	 */
+	 //考虑smp环境下，没有获得锁时需要判断的条件
 	if (!list_empty_careful(&wait->task_list)) {
 		spin_lock_irqsave(&q->lock, flags);
 		list_del_init(&wait->task_list);
