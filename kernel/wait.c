@@ -11,6 +11,7 @@
 #include <linux/wait.h>
 #include <linux/hash.h>
 
+//把非互斥进程插入到等待队列的头部
 void fastcall add_wait_queue(wait_queue_head_t *q, wait_queue_t *wait)
 {
 	unsigned long flags;
@@ -22,6 +23,7 @@ void fastcall add_wait_queue(wait_queue_head_t *q, wait_queue_t *wait)
 }
 EXPORT_SYMBOL(add_wait_queue);
 
+//把互斥进程插入到等待队列的尾部
 void fastcall add_wait_queue_exclusive(wait_queue_head_t *q, wait_queue_t *wait)
 {
 	unsigned long flags;
