@@ -480,11 +480,33 @@ ENTRY(ret_from_exception)
 	mov	why, #0
 	b	ret_to_user
 
+//http://blog.sina.com.cn/s/blog_d9889c5b0101e7x6.html
+//@ r0 = previous task_struct, r1 = previous thread_info, r2 = next thread_info
+//@
+//ENTRY(__switch_to)
+//@ thread_info + TI_CPU_SAVE hold saved cpu context, registers value is stored
+//@ now ip hold the address of the context of previous process 
+//add ip, r1, #TI_CPU_SAVE
+//@ now r3 hold TP value of next process 
+//ldr r3, [r2, #TI_TP_VALUE]
+//@ store current regs to prev thread_info 
+//stmia ip!, {r4 - sl, fp, sp, lr} @ Store most regs on
+//@ store CPU_DOMAIN of next to r6 
+//ldr r6, [r2, #TI_CPU_DOMAIN]
+//@ set tp value and domain to cp15 
+//mcr p15, 0, r3, c13, c0, 3 @ yes, set TLS register
+//mcr p15, 0, r6, c3, c0, 0 @ Set domain register
+//@ now r4 hold the address of the next context 
+//add r4, r2, #TI_CPU_SAVE
+//@ put next context to registers 
+//ldmia r4, {r4 - sl, fp, sp, pc} @ Load all regs saved previously
+//ENDPROC(__switch_to) 	
 /*
  * Register switch for ARMv3 and ARMv4 processors
  * r0 = previous task_struct, r1 = previous thread_info, r2 = next thread_info
  * previous and next are guaranteed not to be the same.
  */
+ 
 ENTRY(__switch_to)
 	add	ip, r1, #TI_CPU_SAVE
 	ldr	r3, [r2, #TI_TP_VALUE]
@@ -511,6 +533,7 @@ ENTRY(__switch_to)
 	ldmib	r4, {r4, r5}
 	mar	acc0, r4, r5
 #endif
+	//感觉r2的值不对，参考2.6.24版本的内核把
 	ldmib	r2, {r4 - sl, fp, sp, pc}	@ Load all regs saved previously
 
 	__INIT
