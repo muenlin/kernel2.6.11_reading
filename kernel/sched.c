@@ -87,7 +87,7 @@
 #define PARENT_PENALTY		100
 #define EXIT_WEIGHT		  3
 #define PRIO_BONUS_RATIO	 25
-#define MAX_BONUS		(MAX_USER_PRIO * PRIO_BONUS_RATIO / 100)
+#define MAX_BONUS		(MAX_USER_PRIO * PRIO_BONUS_RATIO / 100)//40*25/100=10
 #define INTERACTIVE_DELTA	  2
 #define MAX_SLEEP_AVG		(DEF_TIMESLICE * MAX_BONUS)
 #define STARVATION_LIMIT	(MAX_SLEEP_AVG)
@@ -233,6 +233,7 @@ struct runqueue {
 
 	//过期队列中最老的进程被插入队列的时间
 	unsigned long expired_timestamp;
+	//最近一次定时器中断的时间戳的值
 	unsigned long long timestamp_last_tick;
 
 	//idle:当前cpu(this cpu)上swapper进程
@@ -1255,11 +1256,11 @@ void fastcall wake_up_new_task(task_t * p, unsigned long clone_flags)
 			 * do child-runs-first in anticipation of an exec. This
 			 * usually avoids a lot of COW overhead.
 			 */
-			if (unlikely(!current->array))
-				__activate_task(p, rq);
+			if (unlikely(!current->array))//如果父进程不在运行队列中，就把子进程加入到运行队列中
+				__activate_task(p, rq);//子进程加入到运行队列中，此时父进程不在运行队列中
 			else {
 				p->prio = current->prio;
-				//其实把子进程放在了父进程的前面
+				//其实把子进程放在了父进程的前面,父子进程在同一个运行队列中
 				list_add_tail(&p->run_list, &current->run_list);
 				p->array = current->array;
 				p->array->nr_active++;
@@ -1268,7 +1269,7 @@ void fastcall wake_up_new_task(task_t * p, unsigned long clone_flags)
 			set_need_resched();
 		} else
 			/* Run child last */
-			__activate_task(p, rq);
+			__activate_task(p, rq);//把子进程放在队列的尾部
 		/*
 		 * We skip the following code due to cpu == this_cpu
 	 	 *
@@ -1277,15 +1278,17 @@ void fastcall wake_up_new_task(task_t * p, unsigned long clone_flags)
 		 */
 		this_rq = rq;
 	} else {
+		//当前，子进程所在的cpu，和local cpu不同
 		this_rq = cpu_rq(this_cpu);
 
 		/*
 		 * Not the local CPU - must adjust timestamp. This should
 		 * get optimised away in the !CONFIG_SMP case.
 		 */
+		 //时间校准这里没有看懂???
 		p->timestamp = (p->timestamp - this_rq->timestamp_last_tick)
 					+ rq->timestamp_last_tick;
-		//父子进程被放在了同一个队列吗，我没有看出来
+		//父子进程被放在了同一个队列吗，我没有看出来???应该是翻译有误
 		__activate_task(p, rq);//插入队列的尾部
 		if (TASK_PREEMPTS_CURR(p, rq))
 			resched_task(rq->curr);
@@ -3070,14 +3073,15 @@ void fastcall __sched wait_for_completion(struct completion *x)
 	if (!x->done) {
 		DECLARE_WAITQUEUE(wait, current);
 
-		wait.flags |= WQ_FLAG_EXCLUSIVE;
+		wait.flags |= WQ_FLAG_EXCLUSIVE;//why ???
+		//因为是互斥进行，所以放在队列尾部
 		__add_wait_queue_tail(&x->wait, &wait);
 		do {
 			__set_current_state(TASK_UNINTERRUPTIBLE);
 			spin_unlock_irq(&x->wait.lock);
 			schedule();
 			spin_lock_irq(&x->wait.lock);
-		} while (!x->done);
+		} while (!x->done);//结束的场景是什么呢???
 		__remove_wait_queue(&x->wait, &wait);
 	}
 	x->done--;

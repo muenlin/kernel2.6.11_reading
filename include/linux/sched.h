@@ -55,6 +55,7 @@ struct exec_domain;
 #define CLONE_DETACHED		0x00400000	/* Unused, ignored */
 #define CLONE_UNTRACED		0x00800000	/* set if the tracing process can't force CLONE_PTRACE on this clone */
 #define CLONE_CHILD_SETTID	0x01000000	/* set the TID in the child */
+//强迫子进程开始时处于task_stopped状态
 #define CLONE_STOPPED		0x02000000	/* Start in stopped state */
 
 /*
@@ -563,6 +564,7 @@ struct task_struct {
 	prio_array_t *array;//包含进程的运行队列的集合
 
 	unsigned long sleep_avg;
+	//timestamp:进程最近插入运行队列的时间，或涉及本进程的最近一次进程切换的时间
 	unsigned long long timestamp, last_ran;
 	int activated;
 

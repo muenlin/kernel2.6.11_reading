@@ -1129,6 +1129,7 @@ long do_fork(unsigned long clone_flags,
 	      int __user *child_tidptr)
 {
 	struct task_struct *p;
+	struct task_struct *current;
 	int trace = 0;
 	long pid = alloc_pidmap();
 
@@ -1148,7 +1149,7 @@ long do_fork(unsigned long clone_flags,
 	if (!IS_ERR(p)) {
 		struct completion vfork;
 
-		if (clone_flags & CLONE_VFORK) {
+		if (clone_flags & CLONE_VFORK) {//CLONE_VFORK的作用和场景是什么???
 			p->vfork_done = &vfork;
 			init_completion(&vfork);
 		}
@@ -1157,12 +1158,14 @@ long do_fork(unsigned long clone_flags,
 			/*
 			 * We'll start up with an immediate SIGSTOP.
 			 */
+			 //SIGSTOP:停止进程执行
 			sigaddset(&p->pending.signal, SIGSTOP);
+			//why ????作用是什么???
 			set_tsk_thread_flag(p, TIF_SIGPENDING);
 		}
 
 		if (!(clone_flags & CLONE_STOPPED))
-			wake_up_new_task(p, clone_flags);
+			wake_up_new_task(p, clone_flags);//子进程插入运行队列，开始开始执行
 		else
 			p->state = TASK_STOPPED;
 
@@ -1172,7 +1175,7 @@ long do_fork(unsigned long clone_flags,
 		}
 
 		if (clone_flags & CLONE_VFORK) {
-			wait_for_completion(&vfork);
+			wait_for_completion(&vfork);//父进程进入等待队列
 			if (unlikely (current->ptrace & PT_TRACE_VFORK_DONE))
 				ptrace_notify ((PTRACE_EVENT_VFORK_DONE << 8) | SIGTRAP);
 		}
