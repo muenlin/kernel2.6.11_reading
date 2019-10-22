@@ -60,7 +60,7 @@
  */
 #define in_irq()		(hardirq_count())
 #define in_softirq()		(softirq_count())
-#define in_interrupt()		(irq_count())
+#define in_interrupt()		(irq_count())//hard irq + soft irq
 
 #if defined(CONFIG_PREEMPT) && !defined(CONFIG_PREEMPT_BKL)
 # define in_atomic()	((preempt_count() & ~PREEMPT_ACTIVE) != kernel_locked())
