@@ -84,9 +84,10 @@ asmlinkage void __do_softirq(void)
 	cpu = smp_processor_id();
 restart:
 	/* Reset the pending bitmask before enabling irqs */
-	local_softirq_pending() = 0;
+	//以便可以激活新的软中断
+	local_softirq_pending() = 0;//和104行遥相呼应
 
-	local_irq_enable();
+	local_irq_enable();//必须打开，以免中断丢失
 
 	h = softirq_vec;
 
@@ -99,7 +100,8 @@ restart:
 		pending >>= 1;
 	} while (pending);
 
-	local_irq_disable();
+	local_irq_disable();//softirq是在中断处理完成后，返回中断点之前执行的函数
+	                    //这里禁用了irq，返回到中断点时，中断就会被打开
 
 	pending = local_softirq_pending();
 	if (pending && --max_restart)
@@ -108,7 +110,7 @@ restart:
 	if (pending)
 		wakeup_softirqd();
 
-	__local_bh_enable();
+	__local_bh_enable();//重新激活可延迟函数
 }
 
 #ifndef __ARCH_HAS_DO_SOFTIRQ
