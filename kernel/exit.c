@@ -801,7 +801,7 @@ fastcall NORET_TYPE void do_exit(long code)
 	tsk->flags |= PF_EXITING;
 	del_timer_sync(&tsk->real_timer);
 
-	if (unlikely(in_atomic()))
+	if (unlikely(in_atomic()))//内核抢占和这个有什么关系呢?不明白???
 		printk(KERN_INFO "note: %s[%d] exited with preempt_count %d\n",
 				current->comm, current->pid,
 				preempt_count());
@@ -835,8 +835,8 @@ fastcall NORET_TYPE void do_exit(long code)
 #endif
 
 	BUG_ON(!(current->flags & PF_DEAD));
-	schedule();
-	BUG();
+	schedule();//调度程序忽略exit_zombie状态的进程
+	BUG();//函数不会返回到这里，因为该进程已经不再具备被调度的条件了
 	/* Avoid "noreturn function does return".  */
 	for (;;) ;
 }

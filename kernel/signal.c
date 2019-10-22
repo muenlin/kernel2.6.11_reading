@@ -1103,6 +1103,8 @@ void zap_other_threads(struct task_struct *p)
 		 * the process.  But don't detach the thread group
 		 * leader.
 		 */
+		 //没有看懂?????
+		 //进程组的领头进程和组内其他进程是父子关系，还是兄弟关系???
 		if (t != p->group_leader)
 			t->exit_signal = -1;
 
