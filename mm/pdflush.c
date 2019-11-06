@@ -202,7 +202,7 @@ int pdflush_operation(void (*fn)(unsigned long), unsigned long arg0)
 		pdf = list_entry(pdflush_list.next, struct pdflush_work, list);
 		list_del_init(&pdf->list);
 		if (list_empty(&pdflush_list))
-			last_empty_jifs = jiffies;
+			last_empty_jifs = jiffies;//说明此时pdf是链表最后一个元素，因此要更新时间戳
 		pdf->fn = fn;
 		pdf->arg0 = arg0;
 		wake_up_process(pdf->who);

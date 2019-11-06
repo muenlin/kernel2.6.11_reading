@@ -211,6 +211,13 @@ out:
  * At what user virtual address is page expected in vma?
  */
  //这个函数没有理解透彻
+
+ //vma->vm_pgoff 和page->index相对起始点都一样
+ //vma->vm_pgoff表示，相对于起始点，vma这个结构在整体中的偏移量是多少
+ //page->index表示，相对于起始点，struct page这个结构在整体中的偏移量是多少
+ //两者的最小单位是页大小(4K/8K)
+ //vma包含若干个struct page
+
  //对于匿名页，看函数page_add_anon_rmap的实现，就清楚细节了
  //对于文件页，目前还没有看懂
 static inline unsigned long
@@ -222,7 +229,7 @@ vma_address(struct page *page, struct vm_area_struct *vma)
 	address = vma->vm_start + ((pgoff - vma->vm_pgoff) << PAGE_SHIFT);
 	if (unlikely(address < vma->vm_start || address >= vma->vm_end)) {
 		/* page should be within any vma from prio_tree_next */
-		BUG_ON(!PageAnon(page));
+		BUG_ON(!PageAnon(page));//如果是文件页，就报错
 		return -EFAULT;
 	}
 	return address;
@@ -513,7 +520,7 @@ static int try_to_unmap_one(struct page *page, struct vm_area_struct *vma)
 	pte_t pteval;
 	int ret = SWAP_AGAIN;
 
-	if (!mm->rss)//???
+	if (!mm->rss)//资源的管理，统计信息
 		goto out;
 	address = vma_address(page, vma);
 	if (address == -EFAULT)
