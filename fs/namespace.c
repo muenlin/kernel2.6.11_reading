@@ -1055,7 +1055,7 @@ long do_mount(char * dev_name, char * dir_name, char *type_page,
 		retval = do_new_mount(&nd, type_page, flags, mnt_flags,
 				      dev_name, data_page);
 dput_out:
-	path_release(&nd);
+	path_release(&nd);//终止安装点的路径名查找
 	return retval;
 }
 

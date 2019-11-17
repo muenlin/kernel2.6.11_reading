@@ -509,6 +509,7 @@ void page_remove_rmap(struct page *page)
  * Subfunctions of try_to_unmap: try_to_unmap_one called
  * repeatedly from either try_to_unmap_anon or try_to_unmap_file.
  */
+ //这个函数没有理解透彻
 static int try_to_unmap_one(struct page *page, struct vm_area_struct *vma)
 {
 	struct mm_struct *mm = vma->vm_mm;
@@ -548,7 +549,7 @@ static int try_to_unmap_one(struct page *page, struct vm_area_struct *vma)
 	if (!pte_present(*pte))
 		goto out_unmap;
 
-	if (page_to_pfn(page) != pte_pfn(*pte))
+	if (page_to_pfn(page) != pte_pfn(*pte))//为什么要进行这个检查，why???
 		goto out_unmap;
 
 	/*
@@ -578,7 +579,7 @@ static int try_to_unmap_one(struct page *page, struct vm_area_struct *vma)
 	 * ptes from being unmapped, so swapoff can make progress.
 	 */
 	if (PageSwapCache(page) &&
-	    page_count(page) != page_mapcount(page) + 2) {
+	    page_count(page) != page_mapcount(page) + 2) {//why???,为什么加2???
 		ret = SWAP_FAIL;
 		goto out_unmap;
 	}
