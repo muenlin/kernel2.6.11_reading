@@ -558,7 +558,7 @@ repeat:
  */
 struct inode *new_inode(struct super_block *sb)
 {
-	static unsigned long last_ino;
+	static unsigned long last_ino;/*静态成员，非常有特点*/
 	struct inode * inode;
 
 	spin_lock_prefetch(&inode_lock);
