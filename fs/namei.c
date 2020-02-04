@@ -1351,6 +1351,7 @@ int may_open(struct nameidata *nd, int acc_mode, int flag)
  * for symlinks (where the permissions are checked later).
  * SMP-safe
  */
+ //Ã»ÓĞ¿´¶®
 int open_namei(const char * pathname, int flag, int mode, struct nameidata *nd)
 {
 	int acc_mode, error = 0;
@@ -1392,7 +1393,7 @@ int open_namei(const char * pathname, int flag, int mode, struct nameidata *nd)
 	 * will not do.
 	 */
 	error = -EISDIR;
-	if (nd->last_type != LAST_NORM || nd->last.name[nd->last.len])
+	if (nd->last_type != LAST_NORM || nd->last.name[nd->last.len])//why???
 		goto exit;
 
 	dir = nd->dentry;
