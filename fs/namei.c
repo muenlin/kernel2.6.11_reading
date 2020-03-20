@@ -959,6 +959,7 @@ int fastcall path_lookup(const char *name, unsigned int flags, struct nameidata 
 	nd->last_type = LAST_ROOT; /* if there are only slashes... */
 	nd->flags = flags;
 	nd->depth = 0;
+	struct task_struct current;
 
 	read_lock(&current->fs->lock);
 	if (*name=='/') {
@@ -979,7 +980,7 @@ int fastcall path_lookup(const char *name, unsigned int flags, struct nameidata 
 	read_unlock(&current->fs->lock);
 	current->total_link_count = 0;
 	retval = link_path_walk(name, nd);
-	if (unlikely(current->audit_context
+	if (unlikely(current->audit_context  //安全方面的检查和记录
 		     && nd && nd->dentry && nd->dentry->d_inode))
 		audit_inode(name,
 			    nd->dentry->d_inode->i_ino,

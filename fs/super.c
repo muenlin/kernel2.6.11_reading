@@ -823,7 +823,7 @@ do_kern_mount(const char *fstype, int flags, const char *name, void *data)
 		}
 	}
 
-	sb = type->get_sb(type, flags, name, data);
+	sb = type->get_sb(type, flags, name, data);//down_write(&sb->s_umount);
 	if (IS_ERR(sb))
 		goto out_free_secdata;
  	error = security_sb_kern_mount(sb, secdata);
