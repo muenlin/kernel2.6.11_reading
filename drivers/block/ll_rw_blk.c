@@ -2662,7 +2662,7 @@ void generic_make_request(struct bio *bio)
 	maxsector = bio->bi_bdev->bd_inode->i_size >> 9;
 	if (maxsector) {
 		sector_t sector = bio->bi_sector;
-
+		//检查是否超过了设备的存储空间
 		if (maxsector < nr_sectors || maxsector - nr_sectors < sector) {
 			/*
 			 * This may well happen - the kernel calls bread()

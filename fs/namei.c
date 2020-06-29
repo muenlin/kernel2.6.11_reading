@@ -703,7 +703,7 @@ int fastcall link_path_walk(const char * name, struct nameidata *nd)
 		struct qstr this;
 		unsigned int c;
 
-		err = exec_permission_lite(inode, nd);
+		err = exec_permission_lite(inode, nd);//处理每个inode权限，否则会出现漏洞
 		if (err == -EAGAIN) { 
 			err = permission(inode, MAY_EXEC, nd);
 		}
@@ -722,11 +722,11 @@ int fastcall link_path_walk(const char * name, struct nameidata *nd)
 		this.len = name - (const char *) this.name;
 		this.hash = end_name_hash(hash);
 
-		/* remove trailing slashes? */
-		if (!c)
+		/* remove trailing slashes? */ //删除尾部斜线
+		if (!c)//如果字符c为空，那么说明是最后一个节点，且最后一个节点是文件  
 			goto last_component;
 		while (*++name == '/');
-		if (!*name)
+		if (!*name)//如果'/'后面为空，那么说明这也是最后一个节点，且最后一个节点是目录  
 			goto last_with_slashes;
 
 		/*
