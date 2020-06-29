@@ -2592,6 +2592,7 @@ void blk_wait_queue_drained(request_queue_t *q, int wait_dispatch)
 /*
  * block waiting for the io scheduler being started again.
  */
+ //没有理解到位，不清楚真是意图是什么
 static inline void block_wait_queue_running(request_queue_t *q)
 {
 	DEFINE_WAIT(wait);
@@ -2697,6 +2698,7 @@ end_io:
 			break;
 		}
 
+		//q->max_hw_sectors  单个请求所能处理的最大扇区数(硬约束)
 		if (unlikely(bio_sectors(bio) > q->max_hw_sectors)) {
 			printk("bio too big device %s (%u > %u)\n", 
 				bdevname(bio->bi_bdev, b),
@@ -2708,6 +2710,7 @@ end_io:
 		if (test_bit(QUEUE_FLAG_DEAD, &q->queue_flags))
 			goto end_io;
 
+		//检查当前正在使用的IO调度程序是否可以被动态取代
 		block_wait_queue_running(q);
 
 		/*
