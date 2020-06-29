@@ -2658,7 +2658,11 @@ void generic_make_request(struct bio *bio)
 	sector_t maxsector;
 	int ret, nr_sectors = bio_sectors(bio);
 
+    //https://blog.csdn.net/tiantao2012/article/details/78469520
+    //https://blog.csdn.net/freeandperson/article/details/84426031
+    //debug，防止在不该睡眠的地方却睡眠了，导致系统异常
 	might_sleep();
+	
 	/* Test device or partition size, when known. */
 	maxsector = bio->bi_bdev->bd_inode->i_size >> 9;
 	if (maxsector) {
@@ -2717,10 +2721,11 @@ end_io:
 		 * If this device has partitions, remap block n
 		 * of partition p to block n+start(p) of the disk.
 		 */
+		 //似乎也在说明，一个设备只有一个请求队列，不管这个设备有多少个分区
 		blk_partition_remap(bio);
 
 		ret = q->make_request_fn(q, bio);
-	} while (ret);
+	} while (ret);//为什么用while循环???
 }
 
 EXPORT_SYMBOL(generic_make_request);
